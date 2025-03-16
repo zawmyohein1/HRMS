@@ -1,0 +1,23 @@
+﻿@model List<HRMS.Models.View.EmployeeModel>
+
+@foreach (var employee in Model)
+{
+    <tr>
+        <td>@employee.Name</td>
+        <td>@employee.BirthDate.ToShortDateString()</td>
+        <td>@employee.Phone</td>
+        <td>@employee.Email</td>
+        <td>@employee.Gender</td>
+        <td>@employee.Address</td>
+        <td>@employee.Status</td>
+        <td>
+        <td>
+            <a href="@Url.Action("Edit", "Employee", new { id = employee.Id })" class="btn btn-warning">Edit</a>
+            <button class="btn btn-danger" onclick="deleteEmployee(@employee.Id)">Delete</button>
+            <button class="btn btn-info btn-sm"
+                    onclick='showJobHistoryDetails("@employee.Name", @Html.Raw(Json.Serialize(employee.JobHistories)))'>
+                Details
+            </button>
+        </td>
+    </tr>
+}

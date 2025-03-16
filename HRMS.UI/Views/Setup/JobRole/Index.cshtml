@@ -1,0 +1,56 @@
+﻿@model List<HRMS.Models.Views.Setup.JobRoleModel>
+
+@Html.AntiForgeryToken()
+<div class="container">
+    <h2>Job Roles</h2>
+    <a asp-controller="JobRole" asp-action="Create" class="btn btn-primary">
+        Add Job Role
+    </a>
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Department Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var jobRole in Model)
+            {
+                <tr>
+                    <td>@jobRole.Title</td>
+                    <td>@jobRole.Description</td>
+                    <td>@jobRole.DepartmentName</td>
+                    <td>
+                        <a asp-controller="JobRole" asp-action="Edit" asp-route-id="@jobRole.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <button class="btn btn-danger btn-sm" onclick="deleteJobRole(@jobRole.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function deleteJobRole(id) {
+        if (!confirm("Are you sure you want to delete this job role?")) return;
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: `/JobRole/Delete/${id}`,
+            type: "Post",
+            headers: {
+                "RequestVerificationToken": token
+            },
+            success: function () {
+                alert("Job Role deleted successfully!");
+                location.reload();
+            },
+            error: function () {
+                alert("Failed to delete job role.");
+            }
+        });
+    }
+</script>

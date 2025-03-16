@@ -1,0 +1,56 @@
+﻿@model List<HRMS.Models.Views.Setup.DepartmentModel>
+
+@Html.AntiForgeryToken()
+<div class="container">
+    <h2>Departments</h2>
+    <a asp-controller="Department" asp-action="Create" class="btn btn-primary">
+        Add Department
+    </a>
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Location Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var department in Model)
+            {
+                <tr>
+                    <td>@department.Name</td>
+                    <td>@department.Description</td>
+                    <td>@department.LocationName</td>
+                    <td>
+                        <a asp-controller="Department" asp-action="Edit" asp-route-id="@department.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <button class="btn btn-danger btn-sm" onclick="deleteDepartment(@department.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function deleteDepartment(id) {
+        if (!confirm("Are you sure you want to delete this department?")) return;
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: `/Department/Delete/${id}`,
+            type: "Post",
+            headers: {
+                "RequestVerificationToken": token
+            },
+            success: function () {
+                alert("Department deleted successfully!");
+                location.reload();
+            },
+            error: function () {
+                alert("Failed to delete department.");
+            }
+        });
+    }
+</script>

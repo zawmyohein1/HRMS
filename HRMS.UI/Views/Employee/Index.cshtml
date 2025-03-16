@@ -1,0 +1,260 @@
+﻿@model HRMS.Models.View.EmployeeDTOPage
+
+@{
+    ViewData["Title"] = "Employees";
+}
+
+@{
+    Layout = "_Layout"; // Ensure this matches your project's layout file name
+}
+
+<h2 class="mb-4">Employees</h2>
+
+<!-- Search & Filter Section -->
+<div class="row mb-3">
+    <div class="col-md-3 mb-1">
+        <label for="searchEmployee">Employee</label>
+        <select id="searchEmployee" class="form-control">
+            <option value="">Select Employee</option>
+            @foreach (var employee in Model.Employees)
+            {
+                <option value="@employee.Id">@employee.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-1">
+        <label for="searchName">Search by Name</label>
+        <input type="text" id="searchName" class="form-control" placeholder="Enter Name">
+    </div>
+
+    <div class="col-md-3 mb-1">
+        <label for="searchGender">Gender</label>
+        <select id="searchGender" class="form-control">
+            <option value="">All Genders</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-1">
+        <label for="searchDepartment">Department</label>
+        <select id="searchDepartment" class="form-control">
+            <option value="">All Departments</option>
+            @foreach (var department in Model.Departments)
+            {
+                <option value="@department.Id">@department.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-1">
+        <label for="searchStatus">Status</label>
+        <select id="searchStatus" class="form-control">
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="On Leave">On Leave</option>
+        </select>
+    </div>
+
+    <div class="col-md-3 mb-1">
+        <label for="searchStartDate">Start Date</label>
+        <input type="date" id="searchStartDate" class="form-control">
+    </div>
+
+    <div class="col-md-3 mb-1">
+        <label for="searchEndDate">End Date</label>
+        <input type="date" id="searchEndDate" class="form-control">
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <button class="btn btn-primary me-2 w-100" onclick="filterEmployees()">Search</button>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <button class="btn btn-secondary w-100" onclick="resetFilters()">Reset</button>
+    </div>
+</div>
+
+<!-- Create Employee Section -->
+<a asp-controller="Employee" asp-action="Create" class="btn btn-primary">
+    + Create Employee
+</a>
+
+<!-- Employee Table -->
+<table class="table table-striped" id="employeeTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Birth Date</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Gender</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in Model.Employees)
+        {
+            <tr>
+                <td>@employee.Name</td>
+                <td>@employee.BirthDate.ToShortDateString()</td>
+                <td>@employee.Phone</td>
+                <td>@employee.Email</td>
+                <td>@employee.Gender</td>
+                <td>@employee.Address</td>
+                <td>@employee.Status</td>
+                <td>
+                    <a asp-controller="Employee" asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-warning">Edit</a>
+                    <button class="btn btn-danger" onclick="deleteEmployee(@employee.Id)">Delete</button>
+                    <!-- "Details" Button - Passing data attributes to the modal -->
+                    <button class="btn btn-info btn-sm"
+                            onclick='showJobHistoryDetails("@employee.Name", @Html.Raw(Json.Serialize(employee.JobHistories)))'>
+                        Details
+                    </button>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Create Employee Function -->
+
+<script>
+    function loadEditForm(employeeId) {
+        $.ajax({
+            url: "/Employee/Edit/" + employeeId,
+            type: "GET",
+            success: function (response) {
+                $("#editEmployeeBody").html(response); // Load partial view into modal body
+                $("#editEmployeeModal").modal("show"); // Show modal
+            },
+            error: function () {
+                alert("Error loading employee details.");
+            }
+        });
+    }
+</script>
+
+<!-- Job History Details Modal -->
+<div class="modal fade" id="jobHistoryModal" tabindex="-1" aria-labelledby="jobHistoryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <!-- Ensure the modal is wide enough -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="jobHistoryLabel">Job History Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <!-- Makes table scrollable if needed -->
+                    <table class="table table-striped table-bordered text-center">
+                        <thead class="table-dark">
+                            <!-- Dark header for better visibility -->
+                            <tr>
+                                <th>Employee</th>
+                                <th>Manager</th>
+                                <th>Job Role</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jobHistoryBody">
+                            <!-- Job history records will be inserted here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for SPA Behavior -->
+<script>
+    function filterEmployees() {
+        var name = document.getElementById("searchName").value;
+        var employeeId = document.getElementById("searchEmployee").value;
+        var gender = document.getElementById("searchGender").value;
+        var startDate = document.getElementById("searchStartDate").value;
+        var endDate = document.getElementById("searchEndDate").value;
+        var status = document.getElementById("searchStatus").value;
+        var departmentId = document.getElementById("searchDepartment").value;
+
+        debugger;
+
+        $.ajax({
+            url: '/Employee/Filter',
+            type: 'GET',
+            data: {
+                name: name,
+                employeeId: employeeId,
+                gender: gender,
+                startDate: startDate,
+                endDate: endDate,
+                status: status,
+                departmentId: departmentId
+            },
+            success: function (data) {
+                $('#employeeTable tbody').html(data);
+            }
+        });
+    }
+
+    function resetFilters() {
+        document.getElementById("searchName").value = "";
+        document.getElementById("searchEmployee").value = "";
+        document.getElementById("searchGender").value = "";
+        document.getElementById("searchStartDate").value = "";
+        document.getElementById("searchEndDate").value = "";
+        document.getElementById("searchStatus").value = "";
+        document.getElementById("searchDepartment").value = "";
+        filterEmployees();
+    }
+
+    function deleteEmployee(id) {
+        if (confirm("Are you sure you want to delete this employee?")) {
+            $.ajax({
+                url: '/Employee/Delete/' + id,
+                type: 'POST',
+                success: function () {
+                    window.location.href = "/Employee/Index/";
+                }
+            });
+        }
+    }
+</script>
+
+<!-- JavaScript for show details job histories -->
+<script>
+    function showJobHistoryDetails(employeeName, jobHistories) {
+        debugger;
+        let tableBody = document.getElementById("jobHistoryBody");
+        tableBody.innerHTML = ""; // Clear previous data
+
+        // Loop through all job histories and add rows dynamically
+        jobHistories.forEach(jh => {
+            let row = `<tr>
+                                                                            <td>${employeeName}</td>
+                                                                            <td>${jh.managerName || "N/A"}</td>
+                                                                            <td>${jh.title || "N/A"}</td>
+                                                                            <td>${jh.startDate ? new Date(jh.startDate).toLocaleDateString() : "N/A"}</td>
+                                                                            <td>${jh.endDate ? new Date(jh.endDate).toLocaleDateString() : "N/A"}</td>
+                                                                            <td>${jh.status}</td>
+                                                                            <td>${jh.comments || "N/A"}</td>
+                                                                       </tr>`;
+            tableBody.innerHTML += row;
+        });
+
+        // Show the Bootstrap modal
+        var modal = new bootstrap.Modal(document.getElementById("jobHistoryModal"));
+        modal.show();
+    }
+
+
+</script>

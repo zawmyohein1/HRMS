@@ -1,0 +1,56 @@
+﻿@model List<HRMS.Models.Views.Setup.LocationModel>
+
+@Html.AntiForgeryToken()
+<div class="container">
+    <h2>Locations</h2>
+    <a asp-controller="Location" asp-action="Create" class="btn btn-primary">
+        Add Location
+    </a>
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var location in Model)
+            {
+                <tr>
+                    <td>@location.Name</td>
+                    <td>@location.City</td>
+                    <td>@location.Country</td>
+                    <td>
+                        <a asp-controller="Location" asp-action="Edit" asp-route-id="@location.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <button class="btn btn-danger btn-sm" onclick="deleteLocation(@location.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function deleteLocation(id) {
+        if (!confirm("Are you sure you want to delete this location?")) return;
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: `/Location/Delete/${id}`,
+            type: "Post",
+            headers: {
+                "RequestVerificationToken": token
+            },
+            success: function () {
+                alert("Location deleted successfully!");
+                location.reload();
+            },
+            error: function () {
+                alert("Failed to delete location.");
+            }
+        });
+    }
+</script>

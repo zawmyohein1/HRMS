@@ -1,0 +1,57 @@
+-- Create Location Details Table
+CREATE TABLE LocationDetails (
+    LocationId INT PRIMARY KEY IDENTITY,
+    Name NVARCHAR(100),
+    City NVARCHAR(100),
+    Country NVARCHAR(100)
+);
+
+-- Create Department Details Table
+CREATE TABLE DepartmentDetails (
+    DepartmentId INT PRIMARY KEY IDENTITY,
+    Name NVARCHAR(100),
+    Description NVARCHAR(255),
+    LocationId INT,
+    FOREIGN KEY (LocationId) REFERENCES LocationDetails(LocationId)
+);
+
+-- Create Job/Role Details Table
+CREATE TABLE JobDetails (
+    JobId INT PRIMARY KEY IDENTITY,
+    Title NVARCHAR(100),
+    Description NVARCHAR(255),
+    DepartmentId INT,
+    FOREIGN KEY (DepartmentId) REFERENCES DepartmentDetails(DepartmentId)
+);
+
+-- Create Employee Details Table (with HireDate)
+CREATE TABLE EmployeeDetails (
+    EmployeeId INT PRIMARY KEY IDENTITY,
+    Name NVARCHAR(100),
+    BirthDate DATE,
+    Phone NVARCHAR(20),
+    Email NVARCHAR(100),
+    Gender NVARCHAR(10),
+    Address NVARCHAR(255),
+    Status NVARCHAR(50),
+    HireDate DATE,  -- New HireDate field
+    DepartmentId INT,
+    JobId INT,
+    FOREIGN KEY (DepartmentId) REFERENCES DepartmentDetails(DepartmentId),
+    FOREIGN KEY (JobId) REFERENCES JobDetails(JobId)
+);
+
+-- Create Job History Details Table
+CREATE TABLE JobHistoryDetails (
+    JobHistoryId INT PRIMARY KEY IDENTITY,
+    EmployeeId INT,
+    ManagerId INT,
+    JobId INT,
+    StartDate DATE,
+    EndDate DATE,
+    Status NVARCHAR(50),
+    Comments NVARCHAR(255),
+    FOREIGN KEY (EmployeeId) REFERENCES EmployeeDetails(EmployeeId),
+    FOREIGN KEY (ManagerId) REFERENCES EmployeeDetails(EmployeeId),
+    FOREIGN KEY (JobId) REFERENCES JobDetails(JobId)
+);

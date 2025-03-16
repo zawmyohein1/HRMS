@@ -1,0 +1,63 @@
+﻿@model List<HRMS.Models.View.JobHistoryModel>
+
+@Html.AntiForgeryToken()
+<div class="container">
+    <h2>Job Histories</h2>
+    <a asp-controller="JobHistory" asp-action="Create" class="btn btn-primary">
+        Assign Job Employee
+    </a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Job Role</th>
+                <th>Manager</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Comments</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var job in Model)
+            {
+                <tr>
+                    <td>@job.EmployeeName</td>
+                    <td>@job.Title</td>
+                    <td>@job.ManagerName</td>
+                    <td>@job.StartDate.ToShortDateString()</td>
+                    <td>@(job.EndDate.HasValue ? job.EndDate.Value.ToShortDateString() : "N/A")</td>
+                    <td>@job.Status</td>
+                    <td>@job.Comments</td>
+                    <td>
+                        <a asp-controller="JobHistory" asp-action="Edit" asp-route-id="@job.Id" class="btn btn-warning">Edit</a>
+                        <button class="btn btn-danger btn-sm" onclick="deleteJobHistory(@job.Id)">Delete</button>    
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+    function deleteJobHistory(id) {
+        if (!confirm("Are you sure you want to delete this job history?")) return;
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: `/JobHistory/Delete/${id}`,
+            type:"Post",
+            headers: {
+                "RequestVerificationToken": token
+            },
+            success: function () {
+                alert("Job History deleted successfully!");
+                location.reload();
+            }
+        });
+    }
+
+</script>

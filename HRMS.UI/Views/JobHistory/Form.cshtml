@@ -1,0 +1,109 @@
+﻿@model HRMS.Models.View.JobHistoryModel
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h5 class="mb-0">@(Model?.Id > 0 ? "Edit Job History" : "Create Job History")</h5>
+            </div>
+            <div class="card-body p-4">
+              @*   @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success: </strong> @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                } *@
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error:</strong> @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <form asp-controller="JobHistory" asp-action="@(Model?.Id > 0 ? "Edit" : "Create")" method="post">
+
+                    <!-- Hidden ID Field (Only used for Edit) -->
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-2">
+                        <label asp-for="EmployeeId" class="form-label">Employee</label>
+                        <select asp-for="EmployeeId" class="form-control form-control-sm">
+                            <option value="">Select Employee</option>
+                            @foreach (var employee in Model.Employees)
+                            {
+                                <option value="@employee.Id">@employee.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="JobRoleId" class="form-label">Job Role</label>
+                        <select asp-for="JobRoleId" class="form-control form-control-sm">
+                            <option value="">Select Job Role</option>
+                            @foreach (var role in Model.JobRoles)
+                            {
+                                <option value="@role.Id">@role.Title</option>
+                            }
+                        </select>
+                        <span asp-validation-for="JobRoleId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="ManagerId" class="form-label">Manager</label>
+                        <select asp-for="ManagerId" class="form-control form-control-sm">
+                            <option value="">Select Manager</option>
+                            @foreach (var manager in Model.Employees)
+                            {
+                                <option value="@manager.Id">@manager.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ManagerId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="StartDate" class="form-label">Start Date</label>
+                        <input asp-for="StartDate" type="date" class="form-control form-control-sm" />
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="EndDate" class="form-label">End Date</label>
+                        <input asp-for="EndDate" type="date" class="form-control form-control-sm" />
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="Status" class="form-label">Status</label>
+                        <select asp-for="Status" class="form-control form-control-sm">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="Comments" class="form-label">Comments</label>
+                        <textarea asp-for="Comments" class="form-control form-control-sm"></textarea>
+                        <span asp-validation-for="Comments" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <a asp-controller="JobHistory" asp-action="Index" class="btn btn-sm btn-secondary">Back</a>
+                        <button type="submit" class="btn btn-sm btn-primary">@(Model?.Id > 0 ? "Update" : "Save")</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

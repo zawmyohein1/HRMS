@@ -1,0 +1,17 @@
+# Ignore Visual Studio files
+.vs/
+*.user
+*.suo
+*.vscode/
+
+# Ignore build outputs
+bin/
+obj/
+Debug/
+Release/
+*.dll
+*.exe
+*.pdb
+
+# Ignore Git ignored files
+*.log
