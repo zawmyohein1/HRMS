@@ -13,9 +13,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRMS.Services", "HRMS.Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRMS.UI", "HRMS.UI\HRMS.UI.csproj", "{DD0BF6F7-FFDD-4D46-B151-6D995FA4AE6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRMS.Common", "HRMS.Common\HRMS.Common.csproj", "{520C8851-9AB8-465E-9105-83FAFC6E427B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRMS.Common", "HRMS.Common\HRMS.Common.csproj", "{520C8851-9AB8-465E-9105-83FAFC6E427B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRMS.Tests", "HRMS.Tests\HRMS.Tests.csproj", "{64EF0309-6305-4199-A1D3-0F64F0412BF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRMS.Tests", "HRMS.Tests\HRMS.Tests.csproj", "{64EF0309-6305-4199-A1D3-0F64F0412BF5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentations", "Documentations", "{4D6E26F1-684A-48CC-814D-E9F45FFBF1A5}"
+	ProjectSection(SolutionItems) = preProject
+		HRMS-Functional Spec.pdf = HRMS-Functional Spec.pdf
+		HRMS-Future Enhancement.pdf = HRMS-Future Enhancement.pdf
+		HRMS-Project Design.pdf = HRMS-Project Design.pdf
+		HRMS-User Guide.pdf = HRMS-User Guide.pdf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1FF9F54-7DF9-4744-B076-B6249E807FA6}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

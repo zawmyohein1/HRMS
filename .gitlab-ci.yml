@@ -1,0 +1,31 @@
+stages:
+  - build
+  - test
+  - scan
+  - deploy
+
+build:
+  stage: build
+  script:
+    - echo "Building HRMS project..."
+    - dotnet restore
+    - dotnet build --configuration Release
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - dotnet test --configuration Release --collect:"XPlat Code Coverage"
+
+sonar_scan:
+  stage: scan
+  image: sonarsource/sonar-scanner-cli
+  script:
+    - sonar-scanner -Dsonar.organization=YourOrganization -Dsonar.projectKey=YourProject -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying package..."
