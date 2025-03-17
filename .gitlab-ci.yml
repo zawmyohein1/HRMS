@@ -51,7 +51,7 @@ sonar_scan:
   script:
     - echo "Running SonarCloud analysis..."
     - dotnet tool install --global dotnet-sonarscanner
-    - dotnet-sonarscanner begin /k:"$PROJECT_KEY" /o:"zawmyohein1" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN" /d:sonar.cs.opencover.reportsPaths="TestResults/coverage.opencover.xml"
+    - dotnet-sonarscanner begin /k:"$PROJECT_KEY" /o:"interview3314711" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN" /d:sonar.cs.opencover.reportsPaths="TestResults/coverage.opencover.xml"
     - dotnet build --configuration Release
     - dotnet-sonarscanner end /d:sonar.login="$SONAR_TOKEN"
   cache:
