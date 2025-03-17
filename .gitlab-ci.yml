@@ -1,8 +1,19 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
 stages:
   - build
   - test
   - scan
   - deploy
+
+variables:
+  SONAR_HOST_URL: "https://sonarcloud.io"
+  SONAR_TOKEN: $SONAR_TOKEN
+  PROJECT_KEY: "zawmyohein1"
+
+before_script:
+  - echo "Starting Pipeline Execution..."
+  - dotnet --version
 
 build:
   stage: build
@@ -10,18 +21,30 @@ build:
     - echo "Building HRMS project..."
     - dotnet restore
     - dotnet build --configuration Release
+  artifacts:
+    paths:
+      - bin/
+      - obj/
 
 test:
   stage: test
   script:
     - echo "Running tests..."
-    - dotnet test --configuration Release --collect:"XPlat Code Coverage"
+    - dotnet test --configuration Release --logger trx --results-directory TestResults
+    - dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+  artifacts:
+    paths:
+      - TestResults/
 
 sonar_scan:
   stage: scan
-  image: sonarsource/sonar-scanner-cli
+  image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
-    - sonar-scanner -Dsonar.organization=zawmyohein1 -Dsonar.projectKey=zawmyohein1 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+    - echo "Running SonarCloud analysis..."
+    - dotnet tool install --global dotnet-sonarscanner
+    - dotnet-sonarscanner begin /k:"$PROJECT_KEY" /o:"zawmyohein1" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN"
+    - dotnet build --configuration Release
+    - dotnet-sonarscanner end /d:sonar.login="$SONAR_TOKEN"
   only:
     - main
 
@@ -29,3 +52,6 @@ deploy:
   stage: deploy
   script:
     - echo "Deploying package..."
+    - echo "You can add deployment scripts here (e.g., upload to a registry, copy to a server, etc.)"
+  only:
+    - main
