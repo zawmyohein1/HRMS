@@ -9,7 +9,7 @@ stages:
 variables:
   SONAR_HOST_URL: "https://sonarcloud.io"
   SONAR_TOKEN: $SONAR_TOKEN
-  PROJECT_KEY: "zawmyohein1"
+  PROJECT_KEY: "interview3314711_hrms"
   GIT_DEPTH: "0"  # Ensures all branches are fetched (required for SonarCloud)
 
 before_script:
