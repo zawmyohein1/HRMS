@@ -1,0 +1,70 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+stages:
+  - build
+  - test
+  - scan
+  - deploy
+
+variables:
+  SONAR_HOST_URL: "https://sonarcloud.io"
+  SONAR_TOKEN: $SONAR_TOKEN
+  PROJECT_KEY: "interview3314711_hrms"
+  GIT_DEPTH: "0"  # Ensures all branches are fetched (required for SonarCloud)
+
+before_script:
+  - echo "Starting Pipeline Execution..."
+  - dotnet --version
+
+build:
+  stage: build
+  script:
+    - echo "Building HRMS project..."
+    - dotnet restore
+    - dotnet build --configuration Release
+  artifacts:
+    paths:
+      - bin/
+      - obj/
+    expire_in: 1 day  # Artifacts will be stored for 1 day to optimize builds
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - dotnet test --configuration Release --logger trx --results-directory TestResults
+    - dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults/coverage.opencover.xml
+  artifacts:
+    paths:
+      - TestResults/
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: TestResults/coverage.opencover.xml
+    expire_in: 1 day
+
+sonar_scan:
+  stage: scan
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  before_script:
+    - export PATH="$PATH:/root/.dotnet/tools"  # Ensure SonarScanner is accessible
+  script:
+    - echo "Running SonarCloud analysis..."
+    - dotnet tool install --global dotnet-sonarscanner
+    - dotnet-sonarscanner begin /k:"$PROJECT_KEY" /o:"interview3314711" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN" /d:sonar.cs.opencover.reportsPaths="TestResults/coverage.opencover.xml"
+    - dotnet build --configuration Release
+    - dotnet-sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying package..."
+    - echo "You can add deployment scripts here (e.g., upload to a registry, copy to a server, etc.)"
+  only:
+    - main
