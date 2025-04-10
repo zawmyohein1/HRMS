@@ -5,12 +5,13 @@ stages:
   - test
   - scan
   - deploy
+  - release  # 👈 Add new stage
 
 variables:
   SONAR_HOST_URL: "https://sonarcloud.io"
   SONAR_TOKEN: $SONAR_TOKEN
   PROJECT_KEY: "test_hrms"
-  GIT_DEPTH: "0"  # Ensures all branches are fetched (required for SonarCloud)
+  GIT_DEPTH: "0"
 
 before_script:
   - echo "Starting Pipeline Execution..."
@@ -26,7 +27,7 @@ build:
     paths:
       - bin/
       - obj/
-    expire_in: 1 day  # Artifacts will be stored for 1 day to optimize builds
+    expire_in: 1 day
 
 test:
   stage: test
@@ -47,7 +48,7 @@ sonar_scan:
   stage: scan
   image: mcr.microsoft.com/dotnet/sdk:8.0
   before_script:
-    - export PATH="$PATH:/root/.dotnet/tools"  # Ensure SonarScanner is accessible
+    - export PATH="$PATH:/root/.dotnet/tools"
   script:
     - echo "Running SonarCloud analysis..."
     - dotnet tool install --global dotnet-sonarscanner
@@ -68,3 +69,13 @@ deploy:
     - echo "You can add deployment scripts here (e.g., upload to a registry, copy to a server, etc.)"
   only:
     - main
+
+release:
+  stage: release
+  script:
+    - echo "Creating GitLab Release for version $CI_COMMIT_TAG"
+  release:
+    tag_name: "$CI_COMMIT_TAG"  # 🔖 Uses the pushed Git tag
+    description: "Release created automatically for tag $CI_COMMIT_TAG"
+  only:
+    - tags  # ✅ This job runs only when a Git tag is pushed
